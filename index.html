@@ -1,772 +1,516 @@
-import React, { useState } from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percepción sobre Biosensores Químicos - Análisis de Encuesta</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const BiosensorSurveyDashboard = () => {
-  const [activeSection, setActiveSection] = useState('all');
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #F8F9FA;
+            color: #2C3E50;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
 
-  // Paleta de colores profesional y suave
-  const colors = {
-    primary: ['#6B9BD1', '#E8927C', '#F9C74F', '#90BE6D', '#9B59B6', '#5DADE2'],
-    soft: ['#AED6F1', '#F5B7B1', '#FAD7A0', '#ABEBC6', '#D7BDE2', '#A9DFBF'],
-  };
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-  // Datos de la encuesta
-  const groupData = [
-    { name: 'Profesional de la salud', value: 26.1, count: 6 },
-    { name: 'Paciente o público general', value: 73.9, count: 17 }
-  ];
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-  const professionData = [
-    { name: 'Farmacia', value: 33.3 },
-    { name: 'Bioquímica', value: 16.7 },
-    { name: 'Microbiología', value: 0 },
-    { name: 'Enfermería', value: 16.7 },
-    { name: 'Tecnología Médica', value: 33.3 },
-    { name: 'Medicina', value: 0 },
-    { name: 'Fisioterapia', value: 0 }
-  ].filter(d => d.value > 0);
+        h1 {
+            font-size: 32px;
+            font-weight: 300;
+            color: #2C3E50;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
 
-  const experienceData = [
-    { name: '1 año', value: 16.7 },
-    { name: '1-3 años', value: 50.0 },
-    { name: '4-6 años', value: 0 },
-    { name: '7-9 años', value: 0 },
-    { name: '>10 años', value: 33.3 }
-  ].filter(d => d.value > 0);
+        .subtitle {
+            font-size: 16px;
+            color: #7F8C8D;
+            font-weight: 400;
+        }
 
-  const institutionData = [
-    { name: 'Pública', value: 50.0 },
-    { name: 'Privada', value: 16.7 },
-    { name: 'Universidad/Investigación', value: 33.3 }
-  ];
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
 
-  const awarenessData = [
-    { name: 'Sí', value: 66.7 },
-    { name: 'No', value: 33.3 }
-  ];
+        .nav-btn {
+            padding: 10px 24px;
+            background-color: #FFFFFF;
+            color: #5D6D7E;
+            border: 1px solid #E0E0E0;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
 
-  const knowledgeSourceData = [
-    { name: 'Medios de comunicación', value: 6.3 },
-    { name: 'Redes sociales', value: 31.3 },
-    { name: 'Amigos o familia', value: 43.8 },
-    { name: 'Investigación', value: 6.3 },
-    { name: 'Entrenamiento laboral', value: 6.3 },
-    { name: 'No tengo conocimiento', value: 6.3 }
-  ];
+        .nav-btn:hover {
+            background-color: #F0F0F0;
+        }
 
-  const trustLevelData = [
-    { nivel: '1 (Bajo)', respuestas: 1, porcentaje: 5 },
-    { nivel: '2', respuestas: 0, porcentaje: 0 },
-    { nivel: '3', respuestas: 7, porcentaje: 35 },
-    { nivel: '4', respuestas: 7, porcentaje: 35 },
-    { nivel: '5 (Alto)', respuestas: 5, porcentaje: 25 }
-  ];
+        .nav-btn.active {
+            background-color: #6B9BD1;
+            color: #FFFFFF;
+        }
 
-  const willingnessData = [
-    { name: 'Sí, es económico', value: 50.0 },
-    { name: 'Sí, aunque sea costoso', value: 40.0 },
-    { name: 'No pagaría por eso', value: 10.0 }
-  ];
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
 
-  const ageData = [
-    { name: '<18 años', value: 19.0 },
-    { name: '18-25 años', value: 57.1 },
-    { name: '26-35 años', value: 4.8 },
-    { name: '51-65 años', value: 19.0 }
-  ];
+        .chart-card {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #F0F0F0;
+        }
 
-  const educationData = [
-    { name: 'Primaria', value: 0 },
-    { name: 'Secundaria', value: 9.5 },
-    { name: 'Universitario', value: 71.4 },
-    { name: 'Posgrado', value: 19.0 }
-  ].filter(d => d.value > 0);
+        .chart-card.wide {
+            grid-column: span 2;
+        }
 
-  const heardAboutData = [
-    { name: 'Sí', value: 50.0 },
-    { name: 'No', value: 50.0 }
-  ];
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 8px;
+        }
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.98)',
-          padding: '12px 16px',
-          border: '1px solid #E0E0E0',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ margin: 0, fontWeight: '600', color: '#2C3E50', fontSize: '14px' }}>
-            {payload[0].name}
-          </p>
-          <p style={{ margin: '4px 0 0 0', color: '#5D6D7E', fontSize: '13px' }}>
-            {payload[0].value.toFixed(1)}%
-          </p>
+        .chart-description {
+            font-size: 13px;
+            color: #95A5A6;
+            margin-bottom: 24px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container.tall {
+            height: 350px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid #E0E0E0;
+            margin-top: 48px;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: #95A5A6;
+            margin-bottom: 8px;
+        }
+
+        footer p:last-child {
+            font-size: 12px;
+            color: #BDC3C7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card.wide {
+                grid-column: span 1;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Percepción Poblacional sobre Biosensores Químicos</h1>
+            <p class="subtitle">Análisis cuantitativo de la encuesta de percepción | n = 23 participantes</p>
+        </header>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="filterCharts('all')">Vista General</button>
+            <button class="nav-btn" onclick="filterCharts('demographics')">Demografía</button>
+            <button class="nav-btn" onclick="filterCharts('knowledge')">Conocimiento</button>
+            <button class="nav-btn" onclick="filterCharts('attitude')">Actitud</button>
         </div>
-      );
-    }
-    return null;
-  };
 
-  const renderLabel = (entry) => {
-    return `${entry.value.toFixed(1)}%`;
-  };
+        <div class="charts-grid">
+            <!-- Grupo de pertenencia -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Clasificación de Participantes</h3>
+                <p class="chart-description">Distribución por grupo de pertenencia</p>
+                <div class="chart-container">
+                    <canvas id="groupChart"></canvas>
+                </div>
+            </div>
 
-  return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#F8F9FA',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      padding: '40px 20px'
-    }}>
-      {/* Header */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto 40px',
-        textAlign: 'center'
-      }}>
-        <h1 style={{
-          fontSize: '32px',
-          fontWeight: '300',
-          color: '#2C3E50',
-          marginBottom: '12px',
-          letterSpacing: '-0.5px'
-        }}>
-          Percepción Poblacional sobre Biosensores Químicos
-        </h1>
-        <p style={{
-          fontSize: '16px',
-          color: '#7F8C8D',
-          fontWeight: '400',
-          margin: 0
-        }}>
-          Análisis cuantitativo de la encuesta de percepción | n = 23 participantes
-        </p>
-      </div>
+            <!-- Profesión -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Distribución por Profesión</h3>
+                <p class="chart-description">Profesionales de la salud encuestados (n = 6)</p>
+                <div class="chart-container">
+                    <canvas id="professionChart"></canvas>
+                </div>
+            </div>
 
-      {/* Navigation */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto 32px',
-        display: 'flex',
-        gap: '12px',
-        flexWrap: 'wrap',
-        justifyContent: 'center'
-      }}>
-        {['all', 'demographics', 'knowledge', 'attitude'].map(section => (
-          <button
-            key={section}
-            onClick={() => setActiveSection(section)}
-            style={{
-              padding: '10px 24px',
-              backgroundColor: activeSection === section ? '#6B9BD1' : '#FFFFFF',
-              color: activeSection === section ? '#FFFFFF' : '#5D6D7E',
-              border: '1px solid #E0E0E0',
-              borderRadius: '24px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease',
-              textTransform: 'capitalize'
-            }}
-            onMouseEnter={(e) => {
-              if (activeSection !== section) {
-                e.target.style.backgroundColor = '#F0F0F0';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeSection !== section) {
-                e.target.style.backgroundColor = '#FFFFFF';
-              }
-            }}
-          >
-            {section === 'all' ? 'Vista General' : 
-             section === 'demographics' ? 'Demografía' :
-             section === 'knowledge' ? 'Conocimiento' : 'Actitud'}
-          </button>
-        ))}
-      </div>
+            <!-- Años de experiencia -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Experiencia Profesional</h3>
+                <p class="chart-description">Años de ejercicio en el área de salud</p>
+                <div class="chart-container">
+                    <canvas id="experienceChart"></canvas>
+                </div>
+            </div>
 
-      {/* Main Content Grid */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-        gap: '24px'
-      }}>
-        
-        {/* Grupo de pertenencia */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Clasificación de Participantes
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Distribución por grupo de pertenencia
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={groupData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {groupData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Tipo de institución -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Tipo de Institución</h3>
+                <p class="chart-description">Afiliación institucional de profesionales</p>
+                <div class="chart-container">
+                    <canvas id="institutionChart"></canvas>
+                </div>
+            </div>
 
-        {/* Profesión */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Distribución por Profesión
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '16px'
-            }}>
-              Profesionales de la salud encuestados (n = 6)
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={professionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {professionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Conocimiento sobre biosensores -->
+            <div class="chart-card" data-category="knowledge">
+                <h3 class="chart-title">Conocimiento sobre Biosensores</h3>
+                <p class="chart-description">Familiaridad con el concepto (profesionales)</p>
+                <div class="chart-container">
+                    <canvas id="awarenessChart"></canvas>
+                </div>
+            </div>
 
-        {/* Años de experiencia */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Experiencia Profesional
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Años de ejercicio en el área de salud
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={experienceData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {experienceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Fuente de conocimiento -->
+            <div class="chart-card" data-category="knowledge">
+                <h3 class="chart-title">Fuente de Conocimiento</h3>
+                <p class="chart-description">Origen de la información sobre biosensores</p>
+                <div class="chart-container">
+                    <canvas id="sourceChart"></canvas>
+                </div>
+            </div>
 
-        {/* Tipo de institución */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Tipo de Institución
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Afiliación institucional de profesionales
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={institutionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {institutionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Nivel de confianza -->
+            <div class="chart-card wide" data-category="attitude">
+                <h3 class="chart-title">Nivel de Confianza en Nuevas Tecnologías Médicas</h3>
+                <p class="chart-description">Escala de 1 (bajo) a 5 (alto) | n = 20 respuestas</p>
+                <div class="chart-container tall">
+                    <canvas id="trustChart"></canvas>
+                </div>
+            </div>
 
-        {/* Conocimiento sobre biosensores */}
-        {(activeSection === 'all' || activeSection === 'knowledge') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Conocimiento sobre Biosensores
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Familiaridad con el concepto (profesionales)
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={awarenessData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {awarenessData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Disposición a pagar -->
+            <div class="chart-card" data-category="attitude">
+                <h3 class="chart-title">Disposición a Pagar</h3>
+                <p class="chart-description">Aceptación económica de biosensores personales</p>
+                <div class="chart-container">
+                    <canvas id="willingnessChart"></canvas>
+                </div>
+            </div>
 
-        {/* Fuente de conocimiento */}
-        {(activeSection === 'all' || activeSection === 'knowledge') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Fuente de Conocimiento
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Origen de la información sobre biosensores
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={knowledgeSourceData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {knowledgeSourceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '11px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Edad -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Distribución Etaria</h3>
+                <p class="chart-description">Rangos de edad de participantes (n = 21)</p>
+                <div class="chart-container">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
 
-        {/* Nivel de confianza */}
-        {(activeSection === 'all' || activeSection === 'attitude') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0',
-            gridColumn: 'span 2'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Nivel de Confianza en Nuevas Tecnologías Médicas
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Escala de 1 (bajo) a 5 (alto) | n = 20 respuestas
-            </p>
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={trustLevelData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
-                <XAxis 
-                  dataKey="nivel" 
-                  tick={{ fill: '#5D6D7E', fontSize: 12 }}
-                  axisLine={{ stroke: '#E0E0E0' }}
-                />
-                <YAxis 
-                  tick={{ fill: '#5D6D7E', fontSize: 12 }}
-                  axisLine={{ stroke: '#E0E0E0' }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="porcentaje" fill="#90BE6D" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Nivel educativo -->
+            <div class="chart-card" data-category="demographics">
+                <h3 class="chart-title">Nivel Educativo</h3>
+                <p class="chart-description">Formación académica de los participantes</p>
+                <div class="chart-container">
+                    <canvas id="educationChart"></canvas>
+                </div>
+            </div>
 
-        {/* Disposición a pagar */}
-        {(activeSection === 'all' || activeSection === 'attitude') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Disposición a Pagar
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Aceptación económica de biosensores personales
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={willingnessData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {willingnessData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+            <!-- Ha escuchado hablar -->
+            <div class="chart-card" data-category="knowledge">
+                <h3 class="chart-title">Exposición Previa al Concepto</h3>
+                <p class="chart-description">¿Ha escuchado sobre biosensores para salud? (público)</p>
+                <div class="chart-container">
+                    <canvas id="heardChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-        {/* Edad (público general) */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Distribución Etaria
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Rangos de edad de participantes (n = 21)
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={ageData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {ageData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* Nivel educativo */}
-        {(activeSection === 'all' || activeSection === 'demographics') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Nivel Educativo
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              Formación académica de los participantes
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={educationData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {educationData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* Ha escuchado hablar */}
-        {(activeSection === 'all' || activeSection === 'knowledge') && (
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            border: '1px solid #F0F0F0'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: '#2C3E50',
-              marginBottom: '8px'
-            }}>
-              Exposición Previa al Concepto
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#95A5A6',
-              marginBottom: '24px'
-            }}>
-              ¿Ha escuchado sobre biosensores para salud? (público)
-            </p>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={heardAboutData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {heardAboutData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors.primary[index % colors.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '48px auto 0',
-        textAlign: 'center',
-        padding: '24px',
-        borderTop: '1px solid #E0E0E0'
-      }}>
-        <p style={{
-          fontSize: '13px',
-          color: '#95A5A6',
-          margin: 0
-        }}>
-          Estudio de la Eficacia Diagnóstica de Biosensores Químicos para Diagnóstico Médico
-        </p>
-        <p style={{
-          fontSize: '12px',
-          color: '#BDC3C7',
-          marginTop: '8px'
-        }}>
-          Universidad Latina de Panamá | Facultad de Ciencias de la Salud | 2025
-        </p>
-      </div>
+        <footer>
+            <p>Estudio de la Eficacia Diagnóstica de Biosensores Químicos para Diagnóstico Médico</p>
+            <p>Universidad Latina de Panamá | Facultad de Ciencias de la Salud | 2025</p>
+        </footer>
     </div>
-  );
-};
 
-export default BiosensorSurveyDashboard;
+    <script>
+        // Configuración de colores
+        const colors = {
+            primary: ['#6B9BD1', '#E8927C', '#F9C74F', '#90BE6D', '#9B59B6', '#5DADE2']
+        };
+
+        // Configuración común para gráficos de pastel
+        const pieOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12 },
+                        color: '#5D6D7E'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                    titleColor: '#2C3E50',
+                    bodyColor: '#5D6D7E',
+                    borderColor: '#E0E0E0',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + '%';
+                        }
+                    }
+                }
+            }
+        };
+
+        // Gráfico 1: Grupo de pertenencia
+        new Chart(document.getElementById('groupChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Profesional de la salud', 'Paciente o público general'],
+                datasets: [{
+                    data: [26.1, 73.9],
+                    backgroundColor: [colors.primary[0], colors.primary[1]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 2: Profesión
+        new Chart(document.getElementById('professionChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Farmacia', 'Bioquímica', 'Enfermería', 'Tecnología Médica'],
+                datasets: [{
+                    data: [33.3, 16.7, 16.7, 33.3],
+                    backgroundColor: [colors.primary[0], colors.primary[1], colors.primary[3], colors.primary[4]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 3: Experiencia
+        new Chart(document.getElementById('experienceChart'), {
+            type: 'pie',
+            data: {
+                labels: ['1 año', '1-3 años', '>10 años'],
+                datasets: [{
+                    data: [16.7, 50.0, 33.3],
+                    backgroundColor: [colors.primary[0], colors.primary[1], colors.primary[4]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 4: Tipo de institución
+        new Chart(document.getElementById('institutionChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Pública', 'Privada', 'Universidad/Investigación'],
+                datasets: [{
+                    data: [50.0, 16.7, 33.3],
+                    backgroundColor: [colors.primary[0], colors.primary[1], colors.primary[2]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 5: Conocimiento
+        new Chart(document.getElementById('awarenessChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Sí', 'No'],
+                datasets: [{
+                    data: [66.7, 33.3],
+                    backgroundColor: [colors.primary[0], colors.primary[1]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 6: Fuente de conocimiento
+        new Chart(document.getElementById('sourceChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Medios de comunicación', 'Redes sociales', 'Amigos o familia', 
+                         'Investigación', 'Entrenamiento laboral', 'No tengo conocimiento'],
+                datasets: [{
+                    data: [6.3, 31.3, 43.8, 6.3, 6.3, 6.3],
+                    backgroundColor: colors.primary
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 7: Nivel de confianza (barras)
+        new Chart(document.getElementById('trustChart'), {
+            type: 'bar',
+            data: {
+                labels: ['1 (Bajo)', '2', '3', '4', '5 (Alto)'],
+                datasets: [{
+                    label: 'Porcentaje de respuestas',
+                    data: [5, 0, 35, 35, 25],
+                    backgroundColor: '#90BE6D',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        titleColor: '#2C3E50',
+                        bodyColor: '#5D6D7E',
+                        borderColor: '#E0E0E0',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#F0F0F0' },
+                        ticks: { 
+                            color: '#5D6D7E',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#5D6D7E' }
+                    }
+                }
+            }
+        });
+
+        // Gráfico 8: Disposición a pagar
+        new Chart(document.getElementById('willingnessChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Sí, es económico', 'Sí, aunque sea costoso', 'No pagaría por eso'],
+                datasets: [{
+                    data: [50.0, 40.0, 10.0],
+                    backgroundColor: [colors.primary[0], colors.primary[1], colors.primary[2]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 9: Edad
+        new Chart(document.getElementById('ageChart'), {
+            type: 'pie',
+            data: {
+                labels: ['<18 años', '18-25 años', '26-35 años', '51-65 años'],
+                datasets: [{
+                    data: [19.0, 57.1, 4.8, 19.0],
+                    backgroundColor: [colors.primary[0], colors.primary[1], colors.primary[2], colors.primary[3]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 10: Nivel educativo
+        new Chart(document.getElementById('educationChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Secundaria', 'Universitario', 'Posgrado'],
+                datasets: [{
+                    data: [9.5, 71.4, 19.0],
+                    backgroundColor: [colors.primary[1], colors.primary[2], colors.primary[3]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Gráfico 11: Ha escuchado hablar
+        new Chart(document.getElementById('heardChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Sí', 'No'],
+                datasets: [{
+                    data: [50.0, 50.0],
+                    backgroundColor: [colors.primary[0], colors.primary[1]]
+                }]
+            },
+            options: pieOptions
+        });
+
+        // Función de filtrado
+        function filterCharts(category) {
+            const cards = document.querySelectorAll('.chart-card');
+            const buttons = document.querySelectorAll('.nav-btn');
+            
+            // Actualizar botones
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar gráficos
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                } else {
+                    if (card.getAttribute('data-category') === category) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
